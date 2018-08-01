@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	rpcAddr     = flag.String("rpc", "http://123.56.10.119:8545", "-rpc http://123.56.10.119:8545")
+	rpcAddr     = flag.String("rpc", "http://xxx:8545", "-rpc http://xxx:8545")
 	accountAddr = flag.String("account", "", "-account 0x63fdb173af269faf42a85a6a5964bb72830b8151")
 	sendAmounts = flag.String("amounts", "0xDE0B6B3A7640000", "-amounts 0xDE0B6B3A7640000")
 	keyFile     = flag.String("keyfile", "", "-keyfile xxx.json")
@@ -42,7 +42,7 @@ func loadKeyfile(fileName string) error {
 
 func usage(prog string) {
 	fmt.Printf("get ETC for one account\n")
-	fmt.Printf("  %s -cmd balanceOf -rpc http://123.56.10.119:8545 -account 0x63fdb173af269faf42a85a6a5964bb72830b8151\n", prog)
+	fmt.Printf("  %s -cmd balanceOf -rpc http://xxx:8545 -account 0x63fdb173af269faf42a85a6a5964bb72830b8151\n", prog)
 	fmt.Printf("send ETC to one account\n")
 	fmt.Printf("  %s -cmd sendETC -keyfile xxx.json -privatekey xxx -account 0xxxx -amounts 0xDE0B6B3A7640000\n", prog)
 }

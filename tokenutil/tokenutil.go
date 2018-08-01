@@ -18,7 +18,7 @@ import (
 var (
 	keyFile      = flag.String("keyfile", "", "-keyfile xxx.json")
 	privateKey   = flag.String("privatekey", "", "-privatekey xxx")
-	rpcAddr      = flag.String("rpc", "http://123.56.10.119:8545", "-rpc http://123.56.10.119:8545")
+	rpcAddr      = flag.String("rpc", "http://xxx:8545", "-rpc http://xxx:8545")
 	contractAddr = flag.String("contractAddr", "0xcc33f3073f3e645f1a8ca094098cca68d8c1087c", "-contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c")
 	accountAddr  = flag.String("account", "", "-account 0x63fdb173af269faf42a85a6a5964bb72830b8151")
 	sendAmounts  = flag.Int64("amounts", 100, "-amounts 100")
@@ -42,12 +42,12 @@ func loadKeyfile(fileName string) error {
 
 func usage(prog string) {
 	fmt.Printf("get token information:\n")
-	fmt.Printf("  %s -cmd tokenInfo -rpc http://123.56.10.119:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
+	fmt.Printf("  %s -cmd tokenInfo -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
 	fmt.Printf("get balance of one account\n")
-	fmt.Printf("  %s -cmd balanceOf -rpc http://123.56.10.119:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
+	fmt.Printf("  %s -cmd balanceOf -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
 	fmt.Printf("    -account 0x49e7888acb220790b363e7061a8a9b46d58bfdc8\n")
 	fmt.Printf("send token to one account\n")
-	fmt.Printf("  %s -cmd sendToken -rpc http://123.56.10.119:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
+	fmt.Printf("  %s -cmd sendToken -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
 	fmt.Printf("    -keyfile xxx.json -privatekey xxx -account 0xxx -amounts 0x2710\n")
 }
 
