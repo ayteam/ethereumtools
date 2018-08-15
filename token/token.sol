@@ -7,6 +7,7 @@ contract Token {
     uint256 public decimals = 2;            //  token digit
 
     mapping (address => uint256) public balanceOf;
+    mapping (address => bool) public lockedAccount;
     mapping (address => mapping (address => uint256)) public allowance;
 
     uint256 public totalSupply = 0;
@@ -30,6 +31,11 @@ contract Token {
         _;
     }
 
+    modifier unLocked {
+        assert(lockedAccount[msg.sender] != true);
+        _;
+    }
+
     function Token(address _addressFounder) {
         owner = msg.sender;
         totalSupply = valueFounder;
@@ -37,7 +43,7 @@ contract Token {
         Transfer(0x0, _addressFounder, valueFounder);
     }
 
-    function transfer(address _to, uint256 _value) isRunning validAddress returns (bool success) {
+    function transfer(address _to, uint256 _value) isRunning validAddress unLocked returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[msg.sender] -= _value;
@@ -46,7 +52,7 @@ contract Token {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) isRunning validAddress returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) isRunning validAddress unLocked returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         require(allowance[_from][msg.sender] >= _value);
@@ -57,7 +63,7 @@ contract Token {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) isRunning validAddress returns (bool success) {
+    function approve(address _spender, uint256 _value) isRunning validAddress unLocked returns (bool success) {
         require(_value == 0 || allowance[msg.sender][_spender] == 0);
         allowance[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -74,6 +80,20 @@ contract Token {
 
     function setName(string _name) isOwner {
         name = _name;
+    }
+
+    function lockAccount(address _account) isOwner {
+        lockedAccount[_account] = true;
+    }
+
+    function unlockAccount(address _account) isOwner {
+        delete lockedAccount[_account];
+    }
+
+    function isLocked(address _account) returns (bool success) {
+        if (lockedAccount[_account] == true)
+            return true;
+        return false;
     }
 
     function burn(uint256 _value) {
