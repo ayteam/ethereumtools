@@ -198,6 +198,20 @@ func lockAccount() error {
 		fmt.Printf("newToken failed,err:%s\n", err.Error())
 		return err
 	}
+
+	/* 添加事件监听 */
+	/* HTTP RPC不支持push notify，因此此处注册会失败，提示notifications not supported
+	如果想要监听事件,需要打开websocket端口并在此端口监听事件
+	*/
+	/*var addr []common.Address
+	c := make(chan *TokenIsLocked, 3)
+	addr = append(addr, common.HexToAddress(*accountAddr))
+	_, err = tk.WatchIsLocked(nil, c, addr)
+	if err != nil {
+		fmt.Printf("WatchIsLocked failed,err:%s\n", err.Error())
+		return err
+	}*/
+
 	// 根据秘钥文件和密码准备签名
 	trOpts, err := bind.NewTransactor(bytes.NewReader(jsonKey), *privateKey)
 	if err != nil {
@@ -211,6 +225,11 @@ func lockAccount() error {
 		return err
 	}
 	fmt.Printf("transaction hash:%s\n", tr.Hash().String())
+
+	/*select {
+	case lk := <-c:
+		fmt.Printf("lk:addr:%s,lock:%v\n", lk.Account.Hash(), lk.Lock)
+	}*/
 	return nil
 }
 
@@ -252,29 +271,6 @@ func unlockAccount() error {
 }
 
 func islock() error {
-	// RPC 拨号
-	dial, err := rpc.Dial(*rpcAddr)
-	if err != nil {
-		fmt.Printf("rpc dail faield,err:%s\n", err.Error())
-		return err
-	}
-	defer dial.Close()
-
-	cli := ethclient.NewClient(dial)
-	defer cli.Close()
-	// 操作合约对象
-	tk, err := NewToken(common.HexToAddress(*contractAddr), cli)
-	if err != nil {
-		fmt.Printf("newToken failed,err:%s\n", err.Error())
-		return err
-	}
-
-	tr, err := tk.IsLocked(nil, common.HexToAddress(*accountAddr))
-	if err != nil {
-		fmt.Printf("UnlockAccount failed,err:%s\n", err.Error())
-		return err
-	}
-	fmt.Printf("transaction hash:%s\n", tr.Hash().String())
 	return nil
 }
 
