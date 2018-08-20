@@ -36,73 +36,87 @@ contract Token {
         _;
     }
 
-    function Token(address _addressFounder) {
+    constructor (address _addressFounder) public {
         owner = msg.sender;
         totalSupply = valueFounder;
         balanceOf[_addressFounder] = valueFounder;
-        Transfer(0x0, _addressFounder, valueFounder);
+        emit Transfer(0x0, _addressFounder, valueFounder);
     }
 
-    function transfer(address _to, uint256 _value) isRunning validAddress unLocked returns (bool success) {
+    function increate(address _addressFounder, uint256 _value) isRunning unLocked isOwner public {
+        require(balanceOf[_addressFounder] + _value > balanceOf[_addressFounder]);
+        require(totalSupply + _value > totalSupply);
+        balanceOf[_addressFounder] += _value;
+        totalSupply += _value;
+        emit Transfer(0x0, _addressFounder, _value);
+    }
+
+    function transfer(address _to, uint256 _value) isRunning validAddress unLocked public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-        Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) isRunning validAddress unLocked returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) isRunning validAddress unLocked public returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         require(allowance[_from][msg.sender] >= _value);
         balanceOf[_to] += _value;
         balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
-    function approve(address _spender, uint256 _value) isRunning validAddress unLocked returns (bool success) {
+    function approve(address _spender, uint256 _value) isRunning validAddress unLocked public returns (bool success) {
         require(_value == 0 || allowance[msg.sender][_spender] == 0);
         allowance[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
-    function stop() isOwner {
+    function stop() isOwner public {
         stopped = true;
     }
 
-    function start() isOwner {
+    function start() isOwner public {
         stopped = false;
     }
 
-    function setName(string _name) isOwner {
+    function setName(string _name) isOwner public {
         name = _name;
     }
 
-    function lockAccount(address _account) isOwner {
+    function lockAccount(address _account) isOwner public {
         lockedAccount[_account] = true;
     }
 
-    function unlockAccount(address _account) isOwner {
+    function unlockAccount(address _account) isOwner public {
         delete lockedAccount[_account];
     }
 
-    function isLocked(address _account) returns (bool success) {
+    function isLocked(address _account) public returns (bool success) {
+        bool locked = false;
         if (lockedAccount[_account] == true)
-            return true;
-        return false;
+            locked = true;
+        else
+            locked = false;
+        emit IsLocked(_account, locked);
+        return locked;
     }
 
-    function burn(uint256 _value) {
+    function burn(uint256 _value) public {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         balanceOf[0x0] += _value;
-        Transfer(msg.sender, 0x0, _value);
+        totalSupply -= _value;
+        emit Transfer(msg.sender, 0x0, _value);
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event IsLocked(address indexed _account, bool lock);
 }

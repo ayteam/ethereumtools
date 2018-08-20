@@ -96,7 +96,7 @@ func sendETC() error {
 	}
 	fmt.Printf("nonce for:%s, is:%d\n", key.Address.String(), nonce)
 	amount, _ := hexutil.DecodeBig(*sendAmounts)
-	t := types.NewTransaction(nonce, common.HexToAddress(*accountAddr), amount, 1000000, big.NewInt(1), []byte{})
+	t := types.NewTransaction(nonce, common.HexToAddress(*accountAddr), amount, 21000, big.NewInt(1), []byte{})
 	trans, err := types.SignTx(t, types.HomesteadSigner{}, key.PrivateKey)
 	if err != nil {
 		fmt.Printf("trans WithSignature failed,err:%s\n", err.Error())

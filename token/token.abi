@@ -87,6 +87,24 @@
 		"type": "function"
 	},
 	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_addressFounder",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "increate",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"constant": true,
 		"inputs": [],
 		"name": "decimals",
@@ -349,6 +367,23 @@
 			}
 		],
 		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "_account",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "lock",
+				"type": "bool"
+			}
+		],
+		"name": "IsLocked",
 		"type": "event"
 	}
 ]

@@ -18,7 +18,7 @@ var (
 	keyFile      = flag.String("keyfile", "", "-keyfile xxx.json")
 	privateKey   = flag.String("privatekey", "", "-privatekey xxx")
 	rpcAddr      = flag.String("rpc", "http://xxx:8545", "-rpc http://xxx:8545")
-	contractAddr = flag.String("contractAddr", "0xcc33f3073f3e645f1a8ca094098cca68d8c1087c", "-contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c")
+	contractAddr = flag.String("contractAddr", "0xe626bb79c98de2912ec2d47547cf66bd7b699da9", "-contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9")
 	accountAddr  = flag.String("account", "", "-account 0x63fdb173af269faf42a85a6a5964bb72830b8151")
 	sendAmounts  = flag.Int64("amounts", 100, "-amounts 100")
 	cmd          = flag.String("cmd", "", "-cmd tokenInfo|balanceOf|sendToken")
@@ -41,13 +41,19 @@ func loadKeyfile(fileName string) error {
 
 func usage(prog string) {
 	fmt.Printf("get token information:\n")
-	fmt.Printf("  %s -cmd tokenInfo -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
+	fmt.Printf("  %s -cmd tokenInfo -rpc http://xxx:8545 -contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9\n", prog)
 	fmt.Printf("get balance of one account\n")
-	fmt.Printf("  %s -cmd balanceOf -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
+	fmt.Printf("  %s -cmd balanceOf -rpc http://xxx:8545 -contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9\n", prog)
 	fmt.Printf("    -account 0x49e7888acb220790b363e7061a8a9b46d58bfdc8\n")
 	fmt.Printf("send token to one account\n")
-	fmt.Printf("  %s -cmd sendToken -rpc http://xxx:8545 -contractAddr 0xcc33f3073f3e645f1a8ca094098cca68d8c1087c\n", prog)
-	fmt.Printf("    -keyfile xxx.json -privatekey xxx -account 0xxx -amounts 0x2710\n")
+	fmt.Printf("  %s -cmd sendToken -rpc http://xxx:8545 -contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9\n", prog)
+	fmt.Printf("    -keyfile xxx.json -privatekey xxx -account 0xxx -amounts 100\n")
+	fmt.Printf("lock account\n")
+	fmt.Printf("  %s -cmd lock -rpc http://xxx:8545 -contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9\n", prog)
+	fmt.Printf("    -keyfile xxx.json -privatekey xxx -account 0xxx\n")
+	fmt.Printf("unlock account\n")
+	fmt.Printf("  %s -cmd unlock -rpc http://xxx:8545 -contractAddr 0xe626bb79c98de2912ec2d47547cf66bd7b699da9\n", prog)
+	fmt.Printf("    -keyfile xxx.json -privatekey xxx -account 0xxx\n")
 }
 
 func getTokenInfo() error {
@@ -171,6 +177,107 @@ func sendToken() error {
 	return nil
 }
 
+func lockAccount() error {
+	if err := loadKeyfile(*keyFile); err != nil {
+		fmt.Printf("loadKeyfile failed,err:%s\n", err.Error())
+		return err
+	}
+	// RPC 拨号
+	dial, err := rpc.Dial(*rpcAddr)
+	if err != nil {
+		fmt.Printf("rpc dail faield,err:%s\n", err.Error())
+		return err
+	}
+	defer dial.Close()
+
+	cli := ethclient.NewClient(dial)
+	defer cli.Close()
+	// 操作合约对象
+	tk, err := NewToken(common.HexToAddress(*contractAddr), cli)
+	if err != nil {
+		fmt.Printf("newToken failed,err:%s\n", err.Error())
+		return err
+	}
+	// 根据秘钥文件和密码准备签名
+	trOpts, err := bind.NewTransactor(bytes.NewReader(jsonKey), *privateKey)
+	if err != nil {
+		fmt.Printf("new transactor failed,err:%s\n", err.Error())
+		return err
+	}
+
+	tr, err := tk.LockAccount(trOpts, common.HexToAddress(*accountAddr))
+	if err != nil {
+		fmt.Printf("LockAccount failed,err:%s\n", err.Error())
+		return err
+	}
+	fmt.Printf("transaction hash:%s\n", tr.Hash().String())
+	return nil
+}
+
+func unlockAccount() error {
+	if err := loadKeyfile(*keyFile); err != nil {
+		fmt.Printf("loadKeyfile failed,err:%s\n", err.Error())
+		return err
+	}
+	// RPC 拨号
+	dial, err := rpc.Dial(*rpcAddr)
+	if err != nil {
+		fmt.Printf("rpc dail faield,err:%s\n", err.Error())
+		return err
+	}
+	defer dial.Close()
+
+	cli := ethclient.NewClient(dial)
+	defer cli.Close()
+	// 操作合约对象
+	tk, err := NewToken(common.HexToAddress(*contractAddr), cli)
+	if err != nil {
+		fmt.Printf("newToken failed,err:%s\n", err.Error())
+		return err
+	}
+	// 根据秘钥文件和密码准备签名
+	trOpts, err := bind.NewTransactor(bytes.NewReader(jsonKey), *privateKey)
+	if err != nil {
+		fmt.Printf("new transactor failed,err:%s\n", err.Error())
+		return err
+	}
+
+	tr, err := tk.UnlockAccount(trOpts, common.HexToAddress(*accountAddr))
+	if err != nil {
+		fmt.Printf("UnlockAccount failed,err:%s\n", err.Error())
+		return err
+	}
+	fmt.Printf("transaction hash:%s\n", tr.Hash().String())
+	return nil
+}
+
+func islock() error {
+	// RPC 拨号
+	dial, err := rpc.Dial(*rpcAddr)
+	if err != nil {
+		fmt.Printf("rpc dail faield,err:%s\n", err.Error())
+		return err
+	}
+	defer dial.Close()
+
+	cli := ethclient.NewClient(dial)
+	defer cli.Close()
+	// 操作合约对象
+	tk, err := NewToken(common.HexToAddress(*contractAddr), cli)
+	if err != nil {
+		fmt.Printf("newToken failed,err:%s\n", err.Error())
+		return err
+	}
+
+	tr, err := tk.IsLocked(nil, common.HexToAddress(*accountAddr))
+	if err != nil {
+		fmt.Printf("UnlockAccount failed,err:%s\n", err.Error())
+		return err
+	}
+	fmt.Printf("transaction hash:%s\n", tr.Hash().String())
+	return nil
+}
+
 func main() {
 	flag.Parse()
 	var err error
@@ -182,6 +289,12 @@ func main() {
 		err = getBalanceOf()
 	case "sendToken":
 		err = sendToken()
+	case "lock":
+		err = lockAccount()
+	case "unlock":
+		err = unlockAccount()
+	case "islock":
+		err = islock()
 	default:
 		usage(os.Args[0])
 	}
