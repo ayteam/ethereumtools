@@ -317,6 +317,22 @@
 	{
 		"inputs": [
 			{
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"name": "_symbol",
+				"type": "string"
+			},
+			{
+				"name": "_decimals",
+				"type": "uint256"
+			},
+			{
+				"name": "_total",
+				"type": "uint256"
+			},
+			{
 				"name": "_addressFounder",
 				"type": "address"
 			}

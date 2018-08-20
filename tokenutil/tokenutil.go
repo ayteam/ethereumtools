@@ -150,7 +150,7 @@ func sendToken() error {
 	defer cli.Close()
 	/*
 		NewToken接口在token.go文件中，其生成命令如下
-		./abigen --abi token.abi --pkg main --type Token --out token.go
+		./abigen --abi token.abi --pkg main --type Token --out token.go --bin token.bin
 		其中token.abi文件内容为合约的ABI json串
 	*/
 	// 操作合约对象

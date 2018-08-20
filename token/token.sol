@@ -2,18 +2,16 @@ pragma solidity ^0.4.11;
 
 contract Token {
 
-    string public name = "SmartisanCoin";      //  token name
-    string public symbol = "STC";           //  token symbol
+    string public name = "";      //  token name
+    string public symbol = "";           //  token symbol
     uint256 public decimals = 2;            //  token digit
+    uint256 public totalSupply = 0;
 
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public lockedAccount;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    uint256 public totalSupply = 0;
     bool public stopped = false;
-
-    uint256 constant valueFounder = 1000000000 * 100;
     address owner = 0x0;
 
     modifier isOwner {
@@ -36,15 +34,19 @@ contract Token {
         _;
     }
 
-    constructor (address _addressFounder) public {
+    constructor (string _name, string _symbol, uint256 _decimals, uint256 _total, address _addressFounder) public {
         owner = msg.sender;
-        totalSupply = valueFounder;
-        balanceOf[_addressFounder] = valueFounder;
-        emit Transfer(0x0, _addressFounder, valueFounder);
+        name = _name;
+        symbol = _symbol;
+        decimals = _decimals;
+        totalSupply = _total;
+
+        balanceOf[_addressFounder] = totalSupply;
+        emit Transfer(0x0, _addressFounder, totalSupply);
     }
 
     function increate(address _addressFounder, uint256 _value) isRunning unLocked isOwner public {
-        require(balanceOf[_addressFounder] + _value > balanceOf[_addressFounder]);
+        require(balanceOf[_addressFounder] + _value >= balanceOf[_addressFounder]);
         require(totalSupply + _value > totalSupply);
         balanceOf[_addressFounder] += _value;
         totalSupply += _value;
@@ -72,7 +74,7 @@ contract Token {
     }
 
     function approve(address _spender, uint256 _value) isRunning validAddress unLocked public returns (bool success) {
-        require(_value == 0 || allowance[msg.sender][_spender] == 0);
+        require(_value > 0);
         allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -99,20 +101,17 @@ contract Token {
     }
 
     function isLocked(address _account) public returns (bool success) {
-        bool locked = false;
         if (lockedAccount[_account] == true)
-            locked = true;
+            emit IsLocked(_account, true);
         else
-            locked = false;
-        emit IsLocked(_account, locked);
-        return locked;
+            emit IsLocked(_account, false);
+        return true;
     }
 
     function burn(uint256 _value) public {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         balanceOf[0x0] += _value;
-        totalSupply -= _value;
         emit Transfer(msg.sender, 0x0, _value);
     }
 
